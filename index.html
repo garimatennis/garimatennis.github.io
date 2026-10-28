@@ -159,6 +159,19 @@ section{padding:96px 0;position:relative}
 #contact h2{margin-bottom:12px}
 #contact .lede{margin:0 auto 30px}
 #contact .mail{font:700 clamp(1.2rem,3.4vw,1.9rem)/1.2 var(--serif);color:var(--ball);text-decoration:none;border-bottom:3px solid var(--ball)}
+.cform{max-width:720px;margin:0 auto;text-align:left;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:30px}
+.cform .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cform label{display:block;font-weight:600;font-size:.9rem;color:var(--mute);margin-bottom:16px}
+.cform .opt{font-weight:400;opacity:.7}
+.cform input,.cform select,.cform textarea{display:block;width:100%;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:1rem}
+.cform select option{color:#000}
+.cform input:focus,.cform select:focus,.cform textarea:focus{outline:2px solid var(--ball);outline-offset:1px}
+.cform .hp{position:absolute;left:-9999px}
+.cform button{cursor:pointer;margin-top:4px}
+.cform button[disabled]{opacity:.6;cursor:wait}
+.cform .status{margin-top:14px;font-weight:600;min-height:1.4em}
+.cform .status.ok{color:var(--ball)}.cform .status.err{color:#ffb4a0}
+@media(max-width:560px){.cform .row{grid-template-columns:1fr;gap:0}.cform{padding:22px}}
 #contact .follow{margin-top:30px;color:var(--mute);font-size:.95rem}
 footer{background:#071225;color:#8fa0bd;font-size:.85rem;padding:30px 0}
 footer p+p{margin-top:6px}
@@ -328,7 +341,7 @@ footer p+p{margin-top:6px}
 <h4>What you get</h4><ul><li>Logo on kit and bag at events</li><li>Social media features and match content</li><li>Appearances and clinics at your events</li><li>Regular progress reports</li></ul>
 <h4>Where support goes</h4><ul><li>International travel and entry fees</li><li>Coaching and fitness</li><li>Equipment, stringing, recovery and physio</li></ul>
 <h4>Ways to partner</h4><p>Cash, equipment or apparel, travel or accommodation, or a custom package.</p>
-<a class="btn" href="mailto:dhanashri.pawar83@gmail.com?subject=Sponsorship%20enquiry%20-%20Garima%20Kalugade">Discuss sponsorship</a></div>
+<a class="btn" href="#contact" data-topic="Sponsorship">Discuss sponsorship</a></div>
 <div class="acard rv" style="--c:var(--wg)"><span class="eyebrow">Federations</span><h3>A player who competes across borders</h3>
 <h4>Registered with</h4><p>Tennis Iceland (TSÍ) and AITA (India), with results on Tennis Europe and ITF events.</p>
 <h4>Looking for</h4><ul><li>Team and training camp selection</li><li>Travel and entry support</li><li>Access to national events and wild cards</li></ul>
@@ -342,8 +355,24 @@ footer p+p{margin-top:6px}
 <section id="contact"><div class="wrap">
 <span class="eyebrow rv">Contact</span>
 <h2 class="rv">Management and enquiries</h2>
-<p class="lede rv">Dhanashri Pawar, Garima's mother</p>
-<a class="mail rv" href="mailto:dhanashri.pawar83@gmail.com">dhanashri.pawar83@gmail.com</a>
+<p class="lede rv">Messages go to Dhanashri Pawar, Garima's mother, who manages enquiries.</p>
+<form class="cform rv" id="cform" novalidate>
+<input type="hidden" name="access_key" value="71be28d1-e933-4a56-ac68-6a213e4aeacf">
+<input type="hidden" name="subject" value="New enquiry from garimatennis.github.io">
+<input type="hidden" name="from_name" value="Garima Kalugade website">
+<input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+<div class="row">
+<label>Your name<input type="text" name="name" required autocomplete="name"></label>
+<label>Your email<input type="email" name="email" required autocomplete="email"></label>
+</div>
+<div class="row">
+<label>Organisation <span class="opt">(optional)</span><input type="text" name="organisation" autocomplete="organization"></label>
+<label>Enquiry type<select name="enquiry_type" id="topic"><option>Sponsorship</option><option>Federation</option><option>Tournament</option><option>Media</option><option>Other</option></select></label>
+</div>
+<label>Message<textarea name="message" rows="5" required></textarea></label>
+<button class="btn p" type="submit">Send message</button>
+<p class="status" id="cstatus" role="status" aria-live="polite"></p>
+</form>
 <p class="follow rv">Follow her draws: <a href="https://www.itftennis.com/en/players/garima-nitinkumar-kalugade/800737950/ind/wt/s/overview/" target="_blank" rel="noopener">ITF</a> · <a href="https://www.tenniseurope.org" target="_blank" rel="noopener">Tennis Europe</a> · <a href="https://tsi.is" target="_blank" rel="noopener">TSÍ</a></p>
 </div></section>
 <div class="slams" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -369,6 +398,25 @@ footer p+p{margin-top:6px}
     e.target.querySelectorAll('[data-to]').forEach(count);
   });},{threshold:.15});
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+})();
+(function(){
+  var f=document.getElementById('cform'),st=document.getElementById('cstatus'),topic=document.getElementById('topic');
+  document.querySelectorAll('[data-topic]').forEach(function(a){a.addEventListener('click',function(){topic.value=a.dataset.topic;});});
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!f.checkValidity()){st.className='status err';st.textContent='Please fill in your name, a valid email and a message.';return;}
+    var btn=f.querySelector('button');btn.disabled=true;st.className='status';st.textContent='Sending…';
+    var data=Object.fromEntries(new FormData(f));
+    data.subject='['+data.enquiry_type+'] Enquiry from garimatennis.github.io';
+    fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(j.success){st.className='status ok';st.textContent='Thank you. Your message has been sent and you will hear back soon.';f.reset();}
+        else{throw new Error(j.message||'error');}
+      })
+      .catch(function(){st.className='status err';st.textContent='Sorry, the message could not be sent. Please try again in a moment.';})
+      .finally(function(){btn.disabled=false;});
+  });
 })();
 </script>
 </body>
